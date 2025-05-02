@@ -1,0 +1,41 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2639
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;\f1\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red0\green0\blue0;\red125\green15\blue112;
+\red15\green112\blue1;\red205\green0\blue20;\red66\green66\blue66;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\csgray\c0\c0;\cssrgb\c56863\c14510\c51373;
+\cssrgb\c0\c50196\c0;\cssrgb\c85098\c11765\c9412;\cssrgb\c32941\c32941\c32941;}
+\margl1440\margr1440\vieww11520\viewh15560\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf2 # Seguir instrucciones de instalaci\'f3n de https://gwbdoc.readthedocs.io/en/latest/installation.html\
+#Instalar gdal, xvfb, time y libgomp1 \
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf2 sudo apt-get install -y gdal\
+sudo apt-get install -y xvfb\
+sudo apt-get install -y time\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf2 sudo apt-get install -y libgomp1\
+\
+#descargar gwb_amd64.deb o la distribuci\'f3n de Linux que utilice (ver System-wide mode)\
+\
+#Para usar MSPA puede seguir las instrucciones de: https://gwbdoc.readthedocs.io/en/latest/usage/GWB_MSPA.html\
+\
+#En el directorio de trabajo crear las carpetas:\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf2 #input2019, con el GeoTiff del 2019\
+#input2023, con el GeoTiff del 2023\
+#output2019, ac\'e1 se guardan los resultados del 2019\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf2 #output2023, ac\'e1 se guardan los resultados del 2023\
+\cb3 \
+#En la carpeta de input tambi\'e9n guardar los par\'e1metros: \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec4 mspa-parameters.txt\
+\kerning1\expnd0\expndtw0 \outl0\strokewidth0 \
+#Para analizar cada elemento.\
+\cb1 GWB_MSPA \cf0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 -i\cf5 \strokec5 =\cf6 \strokec6 $HOME\cf0 \strokec2 /input\cf7 \strokec7  \cf0 \strokec2 -o\cf5 \strokec5 =\cf6 \strokec6 $HOME\cf0 \strokec2 /output\
+
+\f1 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 \
+\
+}
