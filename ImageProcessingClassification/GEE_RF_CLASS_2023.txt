@@ -1,0 +1,83 @@
+//COBERTURAS 2023
+
+///////////////////////// BLOQUE 1 ////////////////////////
+// Load study area
+var aoi = ee.FeatureCollection("users/ctroche/WWF_Jalisco/aoi") //Cargar previamente el shapefile del área de estudio (aoi) como “Asset” en GEE. Para mejorar el rendimiento del proceso, se recomienda importar este Asset al inicio del script y eliminar esta línea.
+// Load Sentinel 2A image
+var s2a = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
+                  .filterBounds(extent_aoi)
+                  .filterDate('2023-01-01', '2023-10-31')
+                  .select('B1','B2','B3','B4','B5','B8','B9','B11','B12')
+                  .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 10));
+print(s2a, 'Image Collection Jalisco');
+
+//Create a single Image by reducing by Median and clip it to the extent of the geometry
+var s2a_median = s2a.median()
+                    .clip(extent_aoi);
+
+//Print your Image to your console tab to inspect it
+print(s2a_median, 'Mosaico mediana Sentinel-2 2023');
+
+// Establecer variable para visualización de datos
+     var median_vis = {
+       min: 0.0,
+       max: 0.3,
+       bands: ['B4_median', 'B3_median', 'B2_median'],
+};
+     
+//Add your Image as a map layer
+var visParams = {'min': 400,'max': [4000,3000,3000],   'bands':'B4,B3,B2'};
+Map.addLayer(s2a_median, visParams, 'Mosaico mediana Sentinel-2 2018', false);
+
+
+
+///////////////////////// BLOQUE 2 ////////////////////////
+var training_points = ee.FeatureCollection("users/ctroche/sample_points") //Cargar previamente el shapefile de puntos (sample_points) como “Asset” en GEE. Para mejorar el rendimiento del proceso, se recomienda importar este Asset al inicio del script y eliminar esta línea.
+
+// Define a palette for the classification.
+var landcoverPalette = [
+   '1a9850', //Bosque (0) 
+  '4575b4', //Agua (1)
+  '999999', //Antropico (2)
+  'e0e0e0', //Suelo (3)
+  '99d594', //herb (4)
+  'fee08b', //agric (5)
+];
+
+// Overlay the points on the imagery to get training.
+var training = s2a_median.sampleRegions({
+  collection: training_points,
+  properties: ['Class'],
+  scale: 50
+});
+
+///////////////////////// BLOQUE 3 ////////////////////////
+
+//RandomForest Classifier:
+var rfclassifier = ee.Classifier.smileRandomForest(200).train({
+  features: training,
+  classProperty: 'Class',
+});
+
+//Run RF classification
+var rfclassified = s2a_median.classify(rfclassifier);
+print('Randon Forest Info', rfclassified.getInfo());
+
+
+//Display classification
+Map.addLayer(rfclassified.clip(aoi), {palette: landcoverPalette, min: 0, max: 5},'RF classification');
+Map.centerObject(aoi, 9);
+//Map.addLayer(aoi1.clip(aoi),  {palette: 'FF0000'}, 'aoi');
+
+
+///////////////////////// BLOQUE 4 ////////////////////////
+
+// Export the image to drive.
+Export.image.toDrive({
+  image: rfclassified.clip(aoi).toInt(),
+  description: 'Class_2023_randon_Forest',
+  scale: 10,
+  region: aoi,
+  maxPixels: 2500000000
+  
+});
