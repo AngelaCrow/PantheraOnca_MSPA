@@ -1,0 +1,59 @@
+//Códgio para realizar análisis de cambios entre dos fechas.
+//En este caso específico se recodifican todos los posibles cambios se exporta en .tif y posteriormente en un SIG se obtiene 
+// la superficie de cada código (cambio) y se genera una tabla de doble entrada.
+
+// Inicio Código
+// Selecciona las imágenes del año 2019 y 2023
+var image2019 = ee.Image('users/ctroche/WWF_Jalisco/2019_inf'); //Cargar imagen clasificada 2019
+var image2023 = ee.Image('users/ctroche/WWF_Jalisco/2023_inf'); //Cargar imagen clasificada 2023
+var aoi = ee.FeatureCollection("users/ctroche/WWF_Jalisco/aoi")//Cargar vector area de estudio// Define la región de interés
+var sum2019 = image2019.add(1)
+var sum2023 = image2023.add(1)
+
+var img2019 = sum2019.multiply(10)
+var img2023 = sum2023.multiply(100)
+
+var cambios = img2019.add(img2023);
+
+//Map.addLayer(img2019, vis2019, "2019");
+//Map.addLayer(img2023, vis, "2023");
+//Map.addLayer(aoi,{}, "aoi")
+
+var changes = cambios
+  .where(cambios.eq(110), 1) // No cambio Bosque
+  .where(cambios.eq(210), 2) // Cambio de Bosque a agua 
+  .where(cambios.eq(310), 3) // Cambio de Bosque a Antropico
+  .where(cambios.eq(410), 4) // Cambio de Bosque a Suelo desnudo
+  .where(cambios.eq(510), 5) // Cambio de Bosque a herbaceo
+  .where(cambios.eq(220), 6) // No Cambio Agua
+  .where(cambios.eq(120), 7) // Cambio de Agua a Bosque
+  .where(cambios.eq(320), 8) // Cambio de Agua a Antropico
+  .where(cambios.eq(420), 9) // Cambio de Agua a Suelo desnudo
+  .where(cambios.eq(520), 10) // Cambio de Agua a herbaceo
+  .where(cambios.eq(330), 11) // No Cambio Antropico
+  .where(cambios.eq(130), 12) // Cambio de Antropico a Bosque
+  .where(cambios.eq(230), 13) // Cambio de Antropico a Agua 
+  .where(cambios.eq(430), 14) // Cambio de Antropico a Suelo desnudo
+  .where(cambios.eq(530), 15) // Cambio de Antropico a herbaceo 
+  .where(cambios.eq(440), 16) // No Cambio suelo desnudo
+  .where(cambios.eq(140), 17) // Cambio de Suelo desnudo a Bosque
+  .where(cambios.eq(240), 18) // Cambio de Suelo desnudo a Agua 
+  .where(cambios.eq(340), 19) // Cambio de Suelo desnudo a Antropico
+  .where(cambios.eq(540), 20) // Cambio de Suelo desnudo a herbaceo 
+  .where(cambios.eq(550), 21) // No Cambio herbaceo
+  .where(cambios.eq(150), 22) // Cambio de herbaceo a Bosque
+  .where(cambios.eq(250), 23) // Cambio de herbaceo a Agua 
+  .where(cambios.eq(350), 24) // Cambio de herbaceo a Antropico
+  .where(cambios.eq(450), 25); // Cambio de herbaceo a Suelo desnudo
+
+
+// Export the image to drive.
+Export.image.toDrive({
+  image: changes.clip(aoi).toInt(),
+  description: 'cambios_2019_2023_todos',
+  folder: 'WWF_Jalisco',
+  scale: 10,
+  region: aoi,
+  maxPixels: 2500000000,
+  crs:'EPSG:32613'
+});
